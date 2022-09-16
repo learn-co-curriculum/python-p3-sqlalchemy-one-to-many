@@ -1,0 +1,10 @@
+---
+:lessons:
+- :id: 210343
+  :course_id: 5935
+  :canvas_url: https://learning.flatironschool.com/courses/5935/pages/sqlalchemy-relationships
+  :type: page
+- :id: 203809
+  :course_id: 5935
+  :canvas_url: https://learning.flatironschool.com/courses/5935/assignments/203809
+  :type: assignment
