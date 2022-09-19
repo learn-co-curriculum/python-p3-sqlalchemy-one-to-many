@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from one_to_many.app.db import Game, Review
+from models import Game, Review
 
 class TestGame:
     '''Class Game in db.py'''
