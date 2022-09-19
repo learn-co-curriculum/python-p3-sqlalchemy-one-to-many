@@ -1,8 +1,3 @@
-import os
-import sys
-
-sys.path.append(os.getcwd)
-
 from sqlalchemy import create_engine
 from sqlalchemy import ForeignKey, Column, Integer, String
 from sqlalchemy.orm import relationship, backref

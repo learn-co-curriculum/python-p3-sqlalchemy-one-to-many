@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from one_to_many.app.db import Game, Review
+from models import Game, Review
 
 if __name__ == '__main__':
     engine = create_engine('sqlite:///one_to_many/one_to_many.db')
