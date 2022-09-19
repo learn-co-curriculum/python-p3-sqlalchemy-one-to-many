@@ -20,7 +20,7 @@ models, without having to write a ton of SQL ourselves. Sounds great, right? Now
 that we have you totally hooked, let's take a look at how we use these SQLAlchemy
 relationships.
 
-Before we begin, run `pipenv install` and `pipenv shell` to generate and enter
+Before we begin, run `pipenv install && pipenv shell` to generate and enter
 your virtual environment. This will install `sqlalchemy`, `alembic`, `faker`,
 `pytest`, and `ipdb`.
 
@@ -40,7 +40,7 @@ Here is some code that you might use to create a relationship between an order
 and a customer:
 
 ```py
-# imports, base
+# example
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -78,7 +78,7 @@ attributes into a smaller table and create a one-to-one relationship with the
 beefier database for metadata.
 
 ```py
-# imports, base
+# example
 
 class Order(Base):
     __tablename__ = 'orders'
@@ -113,8 +113,8 @@ models: **games** and **reviews**. We'll set up our database so that a game
 By writing a few migrations and making use of the appropriate SQLAlchemy
 methods, we'll be able to:
 
-- ask a game about its reviews.
-- ask a review about its game.
+- Ask a game about its reviews.
+- Ask a review about its game.
 
 Here's what our Entity Relationship Diagram (ERD) looks like:
 
@@ -146,24 +146,33 @@ structure:
 ```console
 .
 ├── alembic.ini
-├── app
-│   ├── __init__.py
-│   └── db.py
-└── migrations
-    ├── README
-    ├── env.py
-    ├── script.py.mako
-    └── versions
+├── db
+├── debug.py
+├── migrations
+│   ├── README
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+│       ├── 0d06d41c7860_initialize_database.py
+│       └── 461383e0c920_create_tables_games_reviews.py
+├── models.py
+├── seed.py
+└── testing
+    ├── conftest.py
+    ├── game_test.py
+    └── review_test.py
 ```
 
-`alembic.ini` points to a SQLite database called `one_to_many.db`. The models
-should go into `app/db.py`; it is already configured to create a `Base`, and
+`alembic.ini` points to a SQLite database called `db/one_to_many.db`. The models
+should go into `models.py`; it is already configured to create a `Base`, and
 `env.py` is pointing to its metadata.
+
+Run `alembic upgrade head` to create your database.
 
 Navigate to `app/db.py` and build a basic model for the `games` table:
 
 ```py
-# imports, base set up for you in app/db.py
+# models.py
 
 class Game(Base):
     __tablename__ = 'games'
@@ -173,6 +182,7 @@ class Game(Base):
     game_genre = Column(String())
     game_platform = Column(String())
     game_price = Column(Integer())
+
 ```
 
 Run `alembic revision --autogenerate -m'Create Game Model'` from inside of the
@@ -203,10 +213,12 @@ Let's take a look at what our `reviews` table will need to look like:
 | ---------- | ------------ | -------------- | ------- |
 |     1      |      10      |   A classic!   |    1    |
 
-Ok! Now that we know what we need to create, let's head back to `app/db.py`
+Ok! Now that we know what we need to create, let's head back to `models.py`
 and write out a new model:
 
 ```py
+# models.py
+
 class Review(Base):
     __tablename__ = 'reviews'
 
@@ -219,24 +231,35 @@ class Review(Base):
 Make sure to add the relationship to `Game` as well:
 
 ```py
+# models.py
+
 class Game(Base):
-    ...
+    
+    # tablename, columns
+
     reviews = relationship('Review', backref=backref('game'))
+
 ```
 
-Lastly, don't forget to set the `__repr__` for each of your models. You''ll
+Lastly, don't forget to set the `__repr__()` for each of your models. You''ll
 thank me later!
 
 ```py
+# models.py
+
 class Game(Base):
-    ...
+    
+    # tablename, columns, relationship
+
     def __repr__(self):
         return f'Game(id={self.game_id}, ' + \
             f'title={self.game_title}, ' + \
             f'platform={self.game_platform})'
 
 class Review(Base):
-    ...
+    
+    # tablename, columns, relationship
+
     def __repr__(self):
         return f'Review(id={self.review_id}, ' + \
             f'score={self.score}, ' + \
@@ -259,7 +282,7 @@ $ alembic upgrade head
 # => INFO  [alembic.runtime.migration] Running upgrade 62797912f786 -> 1f2ce6b5977d, Add Review Model
 ```
 
-There is also some code in the `db/seeds.py` file that we'll use to generate
+There is also some code in the `seed.py` file that we'll use to generate
 some data for our two models. In the seed file, we first create a game instance,
 then use the ID from that game instance to associate it with the corresponding
 review. The data itself is generated automatically using `faker`.
@@ -267,7 +290,7 @@ review. The data itself is generated automatically using `faker`.
 Run this to fill the database with games and reviews:
 
 ```console
-$ python app/seed.py
+$ python seed.py
 ```
 
 ***
@@ -335,6 +358,8 @@ game.reviews
 # => [Review(id=1, score=7, game_id=1), Review(id=2, score=7, game_id=1), Review(id=3, score=8, game_id=1)]
 ```
 
+***
+
 ## Conclusion
 
 In this lesson, we explored the most common kind of relationship between two
@@ -346,6 +371,52 @@ Python applications.
 
 Run `pytest -x` to make sure all of the tests are passing. In the next lesson,
 we'll explore many-to-many relationships in SQLAlchemy
+
+***
+
+## Solution Code
+
+```py
+from sqlalchemy import create_engine
+from sqlalchemy import ForeignKey, Column, Integer, String
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine('sqlite:///db/one_to_many.db')
+
+Base = declarative_base()
+
+class Game(Base):
+    __tablename__ = 'games'
+
+    game_id = Column(Integer(), primary_key=True)
+    game_title = Column(String())
+    game_genre = Column(String())
+    game_platform = Column(String())
+    game_price = Column(Integer())
+
+    reviews = relationship('Review', backref=backref('game'))
+
+    def __repr__(self):
+        return f'Game(id={self.game_id}, ' + \
+            f'title={self.game_title}, ' + \
+            f'platform={self.game_platform})'
+
+class Review(Base):
+    __tablename__ = 'reviews'
+
+    review_id = Column(Integer(), primary_key=True)
+    review_score = Column(Integer())
+    review_comment = Column(String())
+    
+    game_id = Column(Integer(), ForeignKey('games.game_id'))
+
+    def __repr__(self):
+        return f'Review(id={self.review_id}, ' + \
+            f'score={self.review_score}, ' + \
+            f'game_id={self.game_id})'
+
+```
 
 ***
 
