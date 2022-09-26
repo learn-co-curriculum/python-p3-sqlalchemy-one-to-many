@@ -262,7 +262,7 @@ class Review(Base):
 
     def __repr__(self):
         return f'Review(id={self.review_id}, ' + \
-            f'score={self.score}, ' + \
+            f'score={self.review_score}, ' + \
             f'game_id={self.game_id})'
 ```
 
