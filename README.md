@@ -163,7 +163,7 @@ structure:
     └── review_test.py
 ```
 
-`alembic.ini` points to a SQLite database called `db/one_to_many.db`. The models
+`alembic.ini` points to a SQLite database called `one_to_many.db`. The models
 should go into `models.py`; it is already configured to create a `Base`, and
 `env.py` is pointing to its metadata.
 
@@ -382,7 +382,7 @@ from sqlalchemy import ForeignKey, Column, Integer, String
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///db/one_to_many.db')
+engine = create_engine('sqlite:///one_to_many.db')
 
 Base = declarative_base()
 
