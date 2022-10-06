@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from models import Game, Review
 
 if __name__ == '__main__':
-    engine = create_engine('sqlite:///one_to_many/one_to_many.db')
+    engine = create_engine('sqlite:///one_to_many.db')
     Session = sessionmaker(bind=engine)
     session = Session()
 
