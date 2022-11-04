@@ -13,10 +13,10 @@ class TestGame:
 
     # add test data
     mario_kart = Game(
-        game_title="Mario Kart",
-        game_platform="Switch",
-        game_genre="Racing",
-        game_price=60
+        title="Mario Kart",
+        platform="Switch",
+        genre="Racing",
+        price=60
     )
 
     session.add(mario_kart)
@@ -25,30 +25,30 @@ class TestGame:
     mk_review_1 = Review(
         review_score=10,
         review_comment="Wow, what a game",
-        game_id=mario_kart.game_id
+        game_id=mario_kart.id
     )
 
     mk_review_2 = Review(
         review_score=8,
         review_comment="A classic",
-        game_id=mario_kart.game_id
+        game_id=mario_kart.id
     )
 
     session.bulk_save_objects([mk_review_1, mk_review_2])
     session.commit()
 
     def test_game_has_correct_attributes(self):
-        '''has attributes "game_id", "game_title", "game_platform", "game_genre", "game_price".'''
+        '''has attributes "id", "title", "platform", "genre", "price".'''
         assert(
             all(
                 hasattr(
                     TestGame.mario_kart, attr
                 ) for attr in [
-                    "game_id",
-                    "game_title",
-                    "game_platform",
-                    "game_genre",
-                    "game_price"
+                    "id",
+                    "title",
+                    "platform",
+                    "genre",
+                    "price"
                 ]))
 
     def test_has_associated_reviews(self):

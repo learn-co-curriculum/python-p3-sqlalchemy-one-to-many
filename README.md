@@ -45,7 +45,7 @@ and a customer:
 class Customer(Base):
     __tablename__ = 'customers'
 
-    customer_id = Column(Integer(), primary_key=True)
+    id = Column(Integer(), primary_key=True)
 
     orders = relationship('Order', backref='customer')
 
@@ -53,8 +53,8 @@ class Customer(Base):
 class Order(Base):
     __tablename__ = 'orders'
 
-    order_id = Column(Integer(), primary_key=True)
-    customer_id = Column(Integer(), ForeignKey('customers.customer_id'))
+    id = Column(Integer(), primary_key=True)
+    customer_id = Column(Integer(), ForeignKey('customers.id'))
 ```
 
 We can see that the `Customer` model contains an `orders` class attribute
@@ -83,13 +83,13 @@ beefier database for metadata.
 class Order(Base):
     __tablename__ = 'orders'
 
-    order_id = Column(Integer(), primary_key=True)
+    id = Column(Integer(), primary_key=True)
 
 class OrderMetadata(Base):
     __tablename__ = 'orders_metadata'
 
-    order_metadata_id = Column(Integer(), primary_key=True)
-    order_id = Column(Integer(), ForeignKey("order.order_id"))
+    id = Column(Integer(), primary_key=True)
+    order_id = Column(Integer(), ForeignKey("order.id"))
     
     order = relationship('Order',
         backref=backref('order_metadata', uselist=False))
@@ -130,7 +130,7 @@ A game will _have many_ reviews. Before we worry about the migration that will
 implement this in our reviews table, let's think about what that table will look
 like:
 
-|  game_id  |     game_title     |  game_platform  |  game_platform   | game_price |
+|  id  |     title     |  platform  |  platform   | price |
 | --------- | ------------------ | --------------- | ---------------- | ---------- |
 |     1     | Breath of the Wild |      Switch     | Action-adventure |     60     |
 
@@ -159,8 +159,8 @@ structure:
 ├── seed.py
 └── testing
     ├── conftest.py
-    ├── game_test.py
-    └── review_test.py
+    ├── test.py
+    └── test.py
 ```
 
 `alembic.ini` points to a SQLite database called `one_to_many.db`. The models
@@ -177,11 +177,11 @@ Navigate to `app/db.py` and build a basic model for the `games` table:
 class Game(Base):
     __tablename__ = 'games'
 
-    game_id = Column(Integer(), primary_key=True)
-    game_title = Column(String())
-    game_genre = Column(String())
-    game_platform = Column(String())
-    game_price = Column(Integer())
+    id = Column(Integer(), primary_key=True)
+    title = Column(String())
+    genre = Column(String())
+    platform = Column(String())
+    price = Column(Integer())
 
 ```
 
@@ -192,7 +192,7 @@ Run `alembic revision --autogenerate -m'Create Game Model'` from inside of the
 INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
 INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
 INFO  [alembic.autogenerate.compare] Detected added table 'games'
-  Generating ...python-p3-sqlalchemy-one-to-many/one-to-many/migrations/versions/62797912f786_create_game_model.py ...  done
+  Generating ...python-p3-sqlalchemy-one-to-many/one-to-many/migrations/versions/62797912f786_create_model.py ...  done
 ```
 
 Run `alembic upgrade head` to generate a database with your `Game` model.
@@ -209,7 +209,7 @@ belongs to.
 
 Let's take a look at what our `reviews` table will need to look like:
 
-| review_id  | review_score | review_comment | game_id |
+| id  | score | comment | id |
 | ---------- | ------------ | -------------- | ------- |
 |     1      |      10      |   A classic!   |    1    |
 
@@ -222,10 +222,10 @@ and write out a new model:
 class Review(Base):
     __tablename__ = 'reviews'
 
-    review_id = Column(Integer(), primary_key=True)
-    review_score = Column(Integer())
-    review_comment = Column(String())
-    game_id = Column(Integer(), ForeignKey('games.game_id'))
+    id = Column(Integer(), primary_key=True)
+    score = Column(Integer())
+    comment = Column(String())
+    game_id = Column(Integer(), ForeignKey('games.id'))
 ```
 
 Make sure to add the relationship to `Game` as well:
@@ -252,18 +252,18 @@ class Game(Base):
     # tablename, columns, relationship
 
     def __repr__(self):
-        return f'Game(id={self.game_id}, ' + \
-            f'title={self.game_title}, ' + \
-            f'platform={self.game_platform})'
+        return f'Game(id={self.id}, ' + \
+            f'title={self.title}, ' + \
+            f'platform={self.platform})'
 
 class Review(Base):
     
     # tablename, columns, relationship
 
     def __repr__(self):
-        return f'Review(id={self.review_id}, ' + \
-            f'score={self.review_score}, ' + \
-            f'game_id={self.game_id})'
+        return f'Review(id={self.id}, ' + \
+            f'score={self.score}, ' + \
+            f'id={self.id})'
 ```
 
 Great! Now go ahead and run the same commands in your terminal to generate
@@ -274,7 +274,7 @@ $ alembic revision --autogenerate -m'Add Review Model'
 # => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
 # => INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
 # => INFO  [alembic.autogenerate.compare] Detected added table 'reviews'
-# =>   Generating ...sqlalchemy-relationships/python-p3-sqlalchemy-one-to-many/one_to_many/migrations/versions/1f2ce6b5977d_add_review_model.py ...  done
+# =>   Generating ...sqlalchemy-relationships/python-p3-sqlalchemy-one-to-many/one_to_many/migrations/versions/1f2ce6b5977d_add_model.py ...  done
 
 $ alembic upgrade head
 # => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
@@ -306,10 +306,10 @@ debug.py` to set up a session and import the data models:
 # Access the first review instance in the database
 review = session.query(Review).first()
 review
-# => Review(id=1, score=7, game_id=1)
+# => Review(id=1, score=7, id=1)
 
-# Get the game_id foreign key for the review instance
-review.game_id
+# Get the id foreign key for the review instance
+review.id
 # => 1
 ```
 
@@ -318,7 +318,7 @@ could even use the foreign key to access that data directly:
 
 ```py
 # Find a specific game instance using an ID
-session.query(Game).filter_by(game_id=review.game_id).first()
+session.query(Game).filter_by(id=review.id).first()
 # => Game(id=1, title=Jacob Floyd, platform=wii u)
 ```
 
@@ -345,9 +345,9 @@ As expected, this is the same game that we found through the first review. We
 can search for reviews using this game's ID as a filter:
 
 ```py
-reviews = session.query(Review).filter_by(game_id=game.game_id)
+reviews = session.query(Review).filter_by(id=game.id)
 [review for review in reviews]
-# => [Review(id=1, score=7, game_id=1), Review(id=2, score=7, game_id=1), Review(id=3, score=8, game_id=1)]
+# => [Review(id=1, score=7, id=1), Review(id=2, score=7, id=1), Review(id=3, score=8, id=1)]
 ```
 
 But just as with finding the game for a review, we can access a game's reviews
@@ -355,7 +355,7 @@ directly using its relationship:
 
 ```py
 game.reviews
-# => [Review(id=1, score=7, game_id=1), Review(id=2, score=7, game_id=1), Review(id=3, score=8, game_id=1)]
+# => [Review(id=1, score=7, id=1), Review(id=2, score=7, id=1), Review(id=3, score=8, id=1)]
 ```
 
 ***
@@ -389,32 +389,32 @@ Base = declarative_base()
 class Game(Base):
     __tablename__ = 'games'
 
-    game_id = Column(Integer(), primary_key=True)
-    game_title = Column(String())
-    game_genre = Column(String())
-    game_platform = Column(String())
-    game_price = Column(Integer())
+    id = Column(Integer(), primary_key=True)
+    title = Column(String())
+    genre = Column(String())
+    platform = Column(String())
+    price = Column(Integer())
 
     reviews = relationship('Review', backref=backref('game'))
 
     def __repr__(self):
-        return f'Game(id={self.game_id}, ' + \
-            f'title={self.game_title}, ' + \
-            f'platform={self.game_platform})'
+        return f'Game(id={self.id}, ' + \
+            f'title={self.title}, ' + \
+            f'platform={self.platform})'
 
 class Review(Base):
     __tablename__ = 'reviews'
 
-    review_id = Column(Integer(), primary_key=True)
-    review_score = Column(Integer())
-    review_comment = Column(String())
+    id = Column(Integer(), primary_key=True)
+    score = Column(Integer())
+    comment = Column(String())
     
-    game_id = Column(Integer(), ForeignKey('games.game_id'))
+    game_id = Column(Integer(), ForeignKey('games.id'))
 
     def __repr__(self):
-        return f'Review(id={self.review_id}, ' + \
-            f'score={self.review_score}, ' + \
-            f'game_id={self.game_id})'
+        return f'Review(id={self.id}, ' + \
+            f'score={self.score}, ' + \
+            f'id={self.id})'
 
 ```
 

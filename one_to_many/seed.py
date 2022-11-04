@@ -27,10 +27,10 @@ if __name__ == '__main__':
     games = []
     for i in range(50):
         game = Game(
-            game_title=fake.unique.name(),
-            game_genre=random.choice(genres),
-            game_platform=random.choice(platforms),
-            game_price=random.randint(5, 60)
+            title=fake.unique.name(),
+            genre=random.choice(genres),
+            platform=random.choice(platforms),
+            price=random.randint(5, 60)
         )
 
         # add and commit individually to get IDs back
@@ -43,9 +43,9 @@ if __name__ == '__main__':
     for game in games:
         for i in range(random.randint(1,5)):
             review = Review(
-                review_score=random.randint(0, 10),
-                review_comment=fake.sentence(),
-                game_id=game.game_id
+                score=random.randint(0, 10),
+                comment=fake.sentence(),
+                game_id=game.id
             )
 
             reviews.append(review)

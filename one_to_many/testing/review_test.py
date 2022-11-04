@@ -13,34 +13,34 @@ class TestReview:
 
     # add test data
     skyrim = Game(
-        game_title="The Elder Scrolls V: Skyrim",
-        game_platform="PC",
-        game_genre="Adventure",
-        game_price=20
+        title="The Elder Scrolls V: Skyrim",
+        platform="PC",
+        genre="Adventure",
+        price=20
     )
 
     session.add(skyrim)
     session.commit()
 
     skyrim_review = Review(
-        review_score=10,
-        review_comment="Wow, what a game",
-        game_id=skyrim.game_id
+        score=10,
+        comment="Wow, what a game",
+        game_id=skyrim.id
     )
 
     session.add(skyrim_review)
     session.commit()
 
     def test_game_has_correct_attributes(self):
-        '''has attributes "review_id", "review_score", "review_comment", "game_id".'''
+        '''has attributes "id", "score", "comment", "game_id".'''
         assert(
             all(
                 hasattr(
                     TestReview.skyrim_review, attr
                 ) for attr in [
-                    "review_id",
-                    "review_score",
-                    "review_comment",
+                    "id",
+                    "score",
+                    "comment",
                     "game_id",
                 ]))
 
