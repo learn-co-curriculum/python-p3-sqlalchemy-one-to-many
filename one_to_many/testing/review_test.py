@@ -7,7 +7,7 @@ class TestReview:
     '''Class Review in db.py'''
 
     # start session, reset db
-    engine = create_engine('sqlite:///one_to_many/one_to_many.db')
+    engine = create_engine('sqlite:///one_to_many.db')
     Session = sessionmaker(bind=engine)
     session = Session()
 
