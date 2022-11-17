@@ -146,7 +146,6 @@ structure:
 ```console
 .
 ├── alembic.ini
-├── db
 ├── debug.py
 ├── migrations
 │   ├── README
@@ -263,7 +262,7 @@ class Review(Base):
     def __repr__(self):
         return f'Review(id={self.id}, ' + \
             f'score={self.score}, ' + \
-            f'id={self.id})'
+            f'game_id={self.game_id})'
 ```
 
 Great! Now go ahead and run the same commands in your terminal to generate
@@ -306,10 +305,10 @@ debug.py` to set up a session and import the data models:
 # Access the first review instance in the database
 review = session.query(Review).first()
 review
-# => Review(id=1, score=7, id=1)
+# => Review(id=1, score=7, game_id=1)
 
-# Get the id foreign key for the review instance
-review.id
+# Get the game_id foreign key for the review instance
+review.game_id
 # => 1
 ```
 
@@ -318,7 +317,7 @@ could even use the foreign key to access that data directly:
 
 ```py
 # Find a specific game instance using an ID
-session.query(Game).filter_by(id=review.id).first()
+session.query(Game).filter_by(id=review.game_id).first()
 # => Game(id=1, title=Jacob Floyd, platform=wii u)
 ```
 
@@ -345,7 +344,7 @@ As expected, this is the same game that we found through the first review. We
 can search for reviews using this game's ID as a filter:
 
 ```py
-reviews = session.query(Review).filter_by(id=game.id)
+reviews = session.query(Review).filter_by(game_id=game.id)
 [review for review in reviews]
 # => [Review(id=1, score=7, id=1), Review(id=2, score=7, id=1), Review(id=3, score=8, id=1)]
 ```
@@ -355,7 +354,7 @@ directly using its relationship:
 
 ```py
 game.reviews
-# => [Review(id=1, score=7, id=1), Review(id=2, score=7, id=1), Review(id=3, score=8, id=1)]
+# => [Review(id=1, score=7, game_id=1), Review(id=2, score=7, game_id=1), Review(id=3, score=8, game_id=1)]
 ```
 
 ***
@@ -414,7 +413,7 @@ class Review(Base):
     def __repr__(self):
         return f'Review(id={self.id}, ' + \
             f'score={self.score}, ' + \
-            f'id={self.id})'
+            f'game_id={self.game_id})'
 
 ```
 
