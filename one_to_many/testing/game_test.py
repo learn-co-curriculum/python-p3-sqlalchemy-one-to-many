@@ -55,8 +55,8 @@ class TestGame:
         '''has two reviews with scores 10 and 8.'''
         assert(
             len(TestGame.mario_kart.reviews) == 2 and
-            TestGame.mario_kart.reviews[0].review_score == 10 and
-            TestGame.mario_kart.reviews[1].review_score == 8
+            TestGame.mario_kart.reviews[0].score == 10 and
+            TestGame.mario_kart.reviews[1].score == 8
         )
 
     def test_can_add_new_review(self):
