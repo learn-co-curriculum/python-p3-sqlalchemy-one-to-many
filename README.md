@@ -63,6 +63,10 @@ sets the reverse many-to-one relationship that **ref**ers **back** from the
 `Order` model. Inclusion of a foreign key for a `Customer` instance in the
 `Order` model is all that is needed to complete this relationship.
 
+The `backref` goes into the **"one"** of the "one-to-many" relationship, as the
+"one" is a single model object and does not need any additional arguments to
+tell SQLAlchemy that it is something more specific like a list or dictionary.
+
 (If you don't need think you'll need the many-to-one relationship, you can
 leave out the `backref`.)
 
@@ -89,7 +93,7 @@ class OrderMetadata(Base):
     __tablename__ = 'orders_metadata'
 
     id = Column(Integer(), primary_key=True)
-    order_id = Column(Integer(), ForeignKey("order.id"))
+    order_id = Column(Integer(), ForeignKey("orders.id"))
     
     order = relationship('Order',
         backref=backref('order_metadata', uselist=False))
@@ -140,7 +144,7 @@ table. This makes sense even thinking about our domain in the real world: a game
 can exist without any reviews.
 
 The basic structure for your SQLAlchemy app is already configured. Navigate to
-the `one_to_many` directory and you should see the following directory
+the `lib/` directory and you should see the following directory
 structure:
 
 ```console
@@ -168,7 +172,7 @@ should go into `models.py`; it is already configured to create a `Base`, and
 
 Run `alembic upgrade head` to create your database.
 
-Navigate to `app/db.py` and build a basic model for the `games` table:
+Navigate to `lib/models.py` and build a basic model for the `games` table:
 
 ```py
 # models.py
@@ -185,7 +189,7 @@ class Game(Base):
 ```
 
 Run `alembic revision --autogenerate -m'Create Game Model'` from inside of the
-`one_to_many` directory. You should see the following output:
+`lib/` directory. You should see the following output:
 
 ```console
 INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
@@ -273,7 +277,7 @@ $ alembic revision --autogenerate -m'Add Review Model'
 # => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
 # => INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
 # => INFO  [alembic.autogenerate.compare] Detected added table 'reviews'
-# =>   Generating ...sqlalchemy-relationships/python-p3-sqlalchemy-one-to-many/one_to_many/migrations/versions/1f2ce6b5977d_add_model.py ...  done
+# =>   Generating ...sqlalchemy-relationships/python-p3-sqlalchemy-one-to-many/lib/migrations/versions/1f2ce6b5977d_add_model.py ...  done
 
 $ alembic upgrade head
 # => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
