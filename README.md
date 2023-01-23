@@ -156,14 +156,14 @@ structure:
 │   ├── env.py
 │   ├── script.py.mako
 │   └── versions
-│       ├── 0d06d41c7860_initialize_database.py
-│       └── 461383e0c920_create_tables_games_reviews.py
+│       └── 0d06d41c7860_initialize_database.py
 ├── models.py
+├── one_to_many.db
 ├── seed.py
 └── testing
     ├── conftest.py
-    ├── test.py
-    └── test.py
+    ├── game_test.py
+    └── review_test.py
 ```
 
 `alembic.ini` points to a SQLite database called `one_to_many.db`. The models
