@@ -20,7 +20,7 @@ models, without having to write a ton of SQL ourselves. Sounds great, right? Now
 that we have you totally hooked, let's take a look at how we use these SQLAlchemy
 relationships.
 
-Before we begin, run `pipenv install && pipenv shell` to generate and enter
+Before we begin, run `pipenv install; pipenv shell` to generate and enter
 your virtual environment. This will install `sqlalchemy`, `alembic`, `faker`,
 `pytest`, and `ipdb`.
 
