@@ -1,13 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from conftest import SQLITE_URL
 from models import Game, Review
 
 class TestReview:
-    '''Class Review in db.py'''
+    '''Class Review in models.py'''
 
     # start session, reset db
-    engine = create_engine('sqlite:///one_to_many.db')
+    engine = create_engine(SQLITE_URL)
     Session = sessionmaker(bind=engine)
     session = Session()
 
