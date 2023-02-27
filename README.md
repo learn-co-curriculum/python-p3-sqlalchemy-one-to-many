@@ -67,13 +67,13 @@ The `backref` goes into the **"one"** of the "one-to-many" relationship, as the
 "one" is a single model object and does not need any additional arguments to
 tell SQLAlchemy that it is something more specific like a list or dictionary.
 
-(If you don't need think you'll need the many-to-one relationship, you can
+(If you don't think you'll need the many-to-one relationship, you can
 leave out the `backref`.)
 
 ### One-to-One Example
 
-One-to-one relationships aren't _tremendously_ common, but they're simple
-to build in SQLAlchemy ORM if you ever need to!
+One-to-one relationships aren't _tremendously_ common, but they are simple
+to build in SQLAlchemy ORM if you need to!
 
 Let's say that orders have a lot of important associated data, but only two
 or three columns' worth of regularly-queried data. In designing a database to
