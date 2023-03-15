@@ -170,12 +170,44 @@ structure:
 should go into `models.py`; it is already configured to create a `Base`, and
 `env.py` is pointing to its metadata.
 
+We made another change to `env.py` to support the addition of foreign keys on
+line 69:
+
+```py
+connection=connection, target_metadata=target_metadata, render_as_batch=True,
+```
+
+SQLite presents a challenge to migration tools as it does not support `ALTER`
+statements, which relational databases frequently rely upon.
+
+To help solve this problem, Alembic provides the batch operations context.
+With batch operations, a table is named, and then a series of changes
+to that table are specified. When the batch is complete, a process begins
+where the existing table structure is copied from the database, a new version
+of this table is created with the desired changes, data is copied from the old
+table to the new table, and the old table is dropped and the new one renamed to
+the original name.
+
+Just remember that alterations to tables require `render_as_batch=True` in
+`env.py` from the start of your first migration.
+
 Run `alembic upgrade head` to create your database.
 
 Navigate to `lib/models.py` and build a basic model for the `games` table:
 
 ```py
 # models.py
+
+from sqlalchemy import ForeignKey, Column, Integer, String, MetaData
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.declarative import declarative_base
+
+convention = {
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+}
+metadata = MetaData(naming_convention=convention)
+
+Base = declarative_base(metadata=metadata)
 
 class Game(Base):
     __tablename__ = 'games'
@@ -187,6 +219,13 @@ class Game(Base):
     price = Column(Integer())
 
 ```
+
+Note that we've added a `convention` and `metadata` to our models. SQLite
+requires names for changes to foreign keys (we'll talk about these shortly)
+and several other fields in models. Our `convention` provides a template for
+naming these changes, and `metadata` saves them to a `sqlalchemy.MetaData`
+object. Passing this to our `declarative_base` object allows Alembic to generate
+these names automatically when we autogenerate migrations.
 
 Run `alembic revision --autogenerate -m'Create Game Model'` from inside of the
 `lib/` directory. You should see the following output:
@@ -380,11 +419,16 @@ we'll explore many-to-many relationships in SQLAlchemy
 ## Solution Code
 
 ```py
-from sqlalchemy import ForeignKey, Column, Integer, String
+from sqlalchemy import ForeignKey, Column, Integer, String, MetaData
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+convention = {
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+}
+metadata = MetaData(naming_convention=convention)
+
+Base = declarative_base(metadata=metadata)
 
 class Game(Base):
     __tablename__ = 'games'
@@ -426,3 +470,4 @@ class Review(Base):
 - [SQLAlchemy ORM Documentation](https://docs.sqlalchemy.org/en/14/orm/)
 - [Alembic 1.8.1 Documentation](https://alembic.sqlalchemy.org/en/latest/)
 - [Basic Relationship Patterns - SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html)
+- [Running “Batch” Migrations for SQLite and Other Databases](https://alembic.sqlalchemy.org/en/latest/batch.html)
