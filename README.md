@@ -402,6 +402,32 @@ game.reviews
 
 ***
 
+## Cascades
+
+In most **belongs to** relationships like we see here with reviews and games,
+we want to make sure that when the parent disappears, the child does as well.
+SQLAlchemy handles this logic with **cascades**.
+
+A cascade is a behavior of a SQLAlchemy relationship that carries from parents
+to children. _All SQLAlchemy relationships have cascades_. By default, a
+relationship's cascade behavior is set to `'save-update, merge'`. This can be
+changed to any combination of a set of behaviors:
+
+- `save-update`: when an object is placed into a session with `Session.add()`,
+  all objects associated with it should also be added to that same session.
+  - _If a game is added to a session, all of its reviews will be as well._
+- `merge`: if the session contains duplicate objects, `merge` eliminates those
+  duplicates.
+  - _If a game is merged to a session, its reviews that have already
+    been added to the session will not be added again._
+- `all`: a combination of `save-update` and `merge`.
+- `delete`: when a parent is deleted, its children are deleted as well.
+  - _If a game is deleted, its reviews will be deleted as well._
+- `delete-orphan`: when a child is disassociated from its parent, it is deleted.
+  - _If a review is removed from `game.reviews`, the review will be deleted._
+
+***
+
 ## Conclusion
 
 In this lesson, we explored the most common kind of relationship between two
