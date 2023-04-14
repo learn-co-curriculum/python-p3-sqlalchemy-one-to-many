@@ -402,6 +402,67 @@ game.reviews
 
 ***
 
+## Cascades
+
+In most **belongs to** relationships like we see here with reviews and games,
+we want to make sure that when the parent disappears, the child does as well.
+SQLAlchemy handles this logic with **cascades**.
+
+A cascade is a behavior of a SQLAlchemy relationship that carries from parents
+to children. _All SQLAlchemy relationships have cascades_. By default, a
+relationship's cascade behavior is set to `'save-update, merge'`. This can be
+changed to any combination of a set of behaviors:
+
+- `save-update`: when an object is placed into a session with `Session.add()`,
+  all objects associated with it should also be added to that same session.
+  - _If a game is added to a session, all of its reviews will be as well._
+- `merge`: if the session contains duplicate objects, `merge` eliminates those
+  duplicates.
+  - _If a game is merged to a session, its reviews that have already
+    been added to the session will not be added again._
+- `delete`: when a parent is deleted, its children are deleted as well.
+  - _If a game is deleted, its reviews will be deleted as well._
+- `all`: a combination of `save-update`, `merge`, and `delete`.
+- `delete-orphan`: when a child is disassociated from its parent, it is deleted.
+  - _If a review is removed from `game.reviews`, the review will be deleted._
+
+### Configuring a `Game`/`Review` Cascade
+
+As we begin configuring our cascade, let's ask ourselves a few questions:
+
+1. Do we need reviews to be updated when their parent games are updated?
+2. Do we need to avoid adding duplicate reviews to our session?
+3. Do we need to delete reviews when their parent games are deleted?
+4. Do we need to delete reviews when they are no longer associated with games
+   (i.e. orphaned)?
+
+We know that we want reviews to be associated with their parent games, so that's
+a "yes" to number 1. We also want to avoid adding duplicates to the session, so
+that's a "yes" to 2 as well.
+
+Reviews are inherently linked to games, so we should delete them if the games
+no longer exist. That's a "yes" to number 3.
+
+Since we are going to be using `save-update`, `merge`, and `delete`, we can
+start our cascade with `all`.
+
+```py
+reviews = relationship('Review', backref=backref('game'), cascade='all')
+```
+
+Lastly, for the same reason we included `delete`, we _do_ want to delete reviews
+that are no longer associated with games. What good is a review of nothing?
+Let's say "yes" to number 4 as well and finish our cascade:
+
+```py
+reviews = relationship('Review', backref=backref('game'), cascade='all, delete-orphan')
+```
+
+Our database is now configured to delete reviews when their parent games are
+deleted and when they are removed from their parent game, or orphaned.
+
+***
+
 ## Conclusion
 
 In this lesson, we explored the most common kind of relationship between two
@@ -439,7 +500,7 @@ class Game(Base):
     platform = Column(String())
     price = Column(Integer())
 
-    reviews = relationship('Review', backref=backref('game'))
+    reviews = relationship('Review', backref=backref('game'), cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'Game(id={self.id}, ' + \
